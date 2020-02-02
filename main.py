@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from calendar_helpers import get_flights, convert_to_currency_of_dest
+from calendar_helpers import get_flights, flights_info_string
 
 app = Flask(__name__)
 
@@ -13,11 +13,10 @@ def hello_world():
 @app.route('/actions/RBC')
 def RBC_actions():
     flights = get_flights()
-    currency_info = convert_to_currency_of_dest(flights)
-    if not currency_info:
+    flight_info = flights_info_string(flights)
+    if not flight_info:
         return "Unable to find foreign currency information :("
-    amount, curr = currency_info
-    return 'Exchange 500 CAD for %.3f %s' % (amount, curr)
+    return flight_info
 
 @app.route('/confirmations/RBC')
 def RBC_confirmation():

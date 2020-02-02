@@ -64,23 +64,30 @@ def get_flights():
 
     return flights_formatted
 
-def convert_to_currency_of_dest(flights_formatted):
+def flights_info_string(flights_formatted):
+
+    string = ""
+
     for flight in flights_formatted:
         if not flight[2] == 'Montreal':
-            print('We saw you are flying to ' + flight[2] + ' on ' + flight[0] + ' at ' + flight[1])
-            print('Do you want to order foreign currency for the flight to ' + flight[2])
+
+            string += 'We saw you are flying to ' + flight[2] + ' on ' + flight[0] + ' at ' + flight[1] + "<br>"
+
             query = flight[2] + " currency to CAD xe"
 
             for website in search(query, tld="ca", num=20, stop=20):
                 if website[12:18] == 'xe.com':
                     currency = website[website.index('From') + 5: website.index('From') + 8]
                     if not currency == 'CAD':
-                        return currency_converter(currency)
+                        amount, curr = currency_converter(currency)
+                        string += "We can exchange 500 CAD for %.3f %s\n" % (amount, curr)
                     else:
                         currency = website[website.index('To') + 3: website.index('To') + 6]
                         if not currency == 'CAD':
-                            return currency_converter(currency)
+                            amount, curr = currency_converter(currency)
+                            string += "We can exchange 500 CAD for %.3f %s\n" % (amount, curr)
                     break
+    return string
 
 def currency_converter(currency):
     print(currency)
