@@ -11,11 +11,7 @@ import ssl
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
-# If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
-# https://www.googleapis.com/apiName/apiVersion/resourcePath/watch
-# @app.route('/calendar_demo', methods=['GET', 'POST', 'DELETE', 'PATCH'])
-
 
 try:
     from googlesearch import search
@@ -23,15 +19,11 @@ except ImportError:
     print("No module named 'google' found")
 
 
-def calendar():
-    """Shows basic usage of the Google Calendar API.
-    Prints the start and name of the next 10 events on the user's calendar.
-    """
+def get_flights():
+
     creds = None
     flights_formatted = []
-    # The file token.pickle stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
+
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
             creds = pickle.load(token)
@@ -72,7 +64,7 @@ def calendar():
 
     return flights_formatted
 
-def currency(flights_formatted):
+def convert_to_currency_of_dest(flights_formatted):
     for flight in flights_formatted:
         if not flight[2] == 'Montreal':
             print('We saw you are flying to ' + flight[2] + ' on ' + flight[0] + ' at ' + flight[1])

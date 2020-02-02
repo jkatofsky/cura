@@ -1,5 +1,5 @@
-from flask import Flask, request, jsonify, render_template
-from calendar_helpers import calendar, currency
+from flask import Flask, render_template
+from calendar_helpers import get_flights, convert_to_currency_of_dest
 
 app = Flask(__name__)
 
@@ -9,10 +9,11 @@ app = Flask(__name__)
 def hello_world():
     return 'Hello, World!'
 
+# for the demo, we implemented the RBCs Google Calendar integration to automatically send you exchanged money when a flight is detected
 @app.route('/actions/RBC')
 def RBC_actions():
-    flights = calendar()
-    currency_info = currency(flights)
+    flights = get_flights()
+    currency_info = convert_to_currency_of_dest(flights)
     if not currency_info:
         return "Unable to find foreign currency information :("
     amount, curr = currency_info
