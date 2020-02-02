@@ -3,8 +3,6 @@ from calendar_helpers import get_flights, flights_info_string
 
 app = Flask(__name__)
 
-# tweak the calendar API interactions
-
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
