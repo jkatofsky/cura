@@ -73,7 +73,7 @@ def flights_info_string(flights_formatted):
     for flight in flights_formatted:
         if not flight[2] == 'Montreal':
 
-            string += "We saw you are flying to %s on %s at %s. " % (flight[2], flight[0], flight[1])
+            string += "Flight to %s on %s. " % (flight[2], flight[0])
 
             query = "%s currency to CAD xe" % flight[2]
 
@@ -82,7 +82,7 @@ def flights_info_string(flights_formatted):
                     currency = website[website.index('From') + 5: website.index('From') + 8]
                     if not currency == 'CAD':
                         amount, curr = currency_converter(currency)
-                        string += "We can exchange 500 CAD for %.3f %s\n." % (amount, curr)
+                        string += "Exchange 500 CAD for %.3f %s?" % (amount, curr)
                     else:
                         currency = website[website.index('To') + 3: website.index('To') + 6]
                         if not currency == 'CAD':
