@@ -6,16 +6,16 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from currency_converter import CurrencyConverter
-
 import sys
+import ssl
+
+ssl._create_default_https_context = ssl._create_unverified_context
 
 # If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/calendar.readonly/watch']
-## https://www.googleapis.com/apiName/apiVersion/resourcePath/watch
-## @app.route('/calendar_demo', methods=['GET', 'POST', 'DELETE', 'PATCH'])
+SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+# https://www.googleapis.com/apiName/apiVersion/resourcePath/watch
+# @app.route('/calendar_demo', methods=['GET', 'POST', 'DELETE', 'PATCH'])
 
-
-flights_formatted = []
 
 try:
     from googlesearch import search
@@ -28,6 +28,7 @@ def calendar():
     Prints the start and name of the next 10 events on the user's calendar.
     """
     creds = None
+    flights_formatted = []
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
@@ -49,11 +50,11 @@ def calendar():
     service = build('calendar', 'v3', credentials=creds)
 
     # Call the Calendar API
-    now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    print('Getting the upcoming flights', file=sys.stderr)
+    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+    print('Getting the upcoming flights')
     events_result = service.events().list(calendarId='primary', timeMin=now,
-                                        maxResults=10, singleEvents=True,
-                                        orderBy='startTime').execute()
+                                          maxResults=10, singleEvents=True,
+                                          orderBy='startTime').execute()
     events = events_result.get('items', [])
     flights = []
     for event in events:
@@ -67,28 +68,29 @@ def calendar():
         startTime = start[11:19]
         destination = event['summary'].split()
         destination = destination[2]
-        flights_formatted.append([startDate, startTime, destination])
-        print (startDate, startTime, destination)
+        flights_formatted.append((startDate, startTime, destination))
 
-def currency():
+    return flights_formatted
+
+def currency(flights_formatted):
     for flight in flights_formatted:
         if not flight[2] == 'Montreal':
-            print('We saw you are flying to ' + flight[2] + ' on ' + flight[0] + ' at '+ flight[1])
+            print('We saw you are flying to ' + flight[2] + ' on ' + flight[0] + ' at ' + flight[1])
             print('Do you want to order foreign currency for the flight to ' + flight[2])
             query = flight[2] + " currency to CAD"
             for website in search(query, tld="ca", num=7, stop=7):
                 if website[12:18] == 'xe.com':
-                    currency = website[website.index('From')+5 : website.index('From')+8]
+                    currency = website[website.index('From') + 5: website.index('From') + 8]
                     if not currency == 'CAD':
-                        currency_converter(currency)
+                        return currency_converter(currency)
                     else:
-                        currency = website[website.index('To')+3 : website.index('To')+6]
+                        currency = website[website.index('To') + 3: website.index('To') + 6]
                         if not currency == 'CAD':
-                            currency_converter(currency)
-                break
+                            return currency_converter(currency)
+                    break
 
 def currency_converter(currency):
-        print(currency)
-        cur_conv = CurrencyConverter()
-        amount = cur_conv.convert(500, 'CAD', currency)
-        print('We can exchange 500 CAD for %.3f %s automatically.' %(amount, currency))
+    print(currency)
+    cur_conv = CurrencyConverter()
+    amount = cur_conv.convert(500, 'CAD', currency)
+    return (amount, currency)

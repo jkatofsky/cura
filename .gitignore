@@ -18,4 +18,5 @@ docs/_build/
 
 __pycache__
 .vscode
-key.json
+credentials.json
+token.pickle
