@@ -18,7 +18,7 @@ def RBC_action_currency():
 
 @app.route("/actions/RBC/cancel")
 def RBC_action_cancel():
-    return "Due to your upcomming flight, <br> we won't cancel your card abroad."
+    return "Due to your upcomming flight, we won't cancel your card abroad."
 
 @app.route('/confirmations/RBC/currency')
 def RBC_confirmation_currency():
