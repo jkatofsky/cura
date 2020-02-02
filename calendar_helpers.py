@@ -77,8 +77,9 @@ def currency(flights_formatted):
         if not flight[2] == 'Montreal':
             print('We saw you are flying to ' + flight[2] + ' on ' + flight[0] + ' at ' + flight[1])
             print('Do you want to order foreign currency for the flight to ' + flight[2])
-            query = flight[2] + " currency to CAD"
-            for website in search(query, tld="ca", num=7, stop=7):
+            query = flight[2] + " currency to CAD xe"
+
+            for website in search(query, tld="ca", num=20, stop=20):
                 if website[12:18] == 'xe.com':
                     currency = website[website.index('From') + 5: website.index('From') + 8]
                     if not currency == 'CAD':
