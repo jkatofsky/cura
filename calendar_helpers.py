@@ -18,6 +18,11 @@ try:
 except ImportError:
     print("No module named 'google' found")
 
+def space_delim_list_strs(list):
+    string = ""
+    for elem in list:
+        string += " %s " % str(elem)
+    return string
 
 def get_flights():
 
@@ -43,23 +48,20 @@ def get_flights():
 
     # Call the Calendar API
     now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-    print('Getting the upcoming flights')
     events_result = service.events().list(calendarId='primary', timeMin=now,
                                           maxResults=10, singleEvents=True,
                                           orderBy='startTime').execute()
     events = events_result.get('items', [])
     flights = []
     for event in events:
-        if event['summary'].startswith('Flight to'):
+        if event['summary'].lower().startswith('flight to'):
             flights.append(event)
-    if not flights:
-        print('No flights found')
     for event in flights:
         start = event['start'].get('dateTime')
-        startDate = start[0:10]  # event['start'].get('date'))
+        startDate = start[0:10]
         startTime = start[11:19]
         destination = event['summary'].split()
-        destination = destination[2]
+        destination = space_delim_list_strs(destination[2:])
         flights_formatted.append((startDate, startTime, destination))
 
     return flights_formatted
@@ -71,16 +73,16 @@ def flights_info_string(flights_formatted):
     for flight in flights_formatted:
         if not flight[2] == 'Montreal':
 
-            string += 'We saw you are flying to ' + flight[2] + ' on ' + flight[0] + ' at ' + flight[1] + "<br>"
+            string += "We saw you are flying to %s on %s at %s. " % (flight[2], flight[0], flight[1])
 
-            query = flight[2] + " currency to CAD xe"
+            query = "%s currency to CAD xe" % flight[2]
 
             for website in search(query, tld="ca", num=20, stop=20):
                 if website[12:18] == 'xe.com':
                     currency = website[website.index('From') + 5: website.index('From') + 8]
                     if not currency == 'CAD':
                         amount, curr = currency_converter(currency)
-                        string += "We can exchange 500 CAD for %.3f %s\n" % (amount, curr)
+                        string += "We can exchange 500 CAD for %.3f %s\n." % (amount, curr)
                     else:
                         currency = website[website.index('To') + 3: website.index('To') + 6]
                         if not currency == 'CAD':
@@ -90,7 +92,6 @@ def flights_info_string(flights_formatted):
     return string
 
 def currency_converter(currency):
-    print(currency)
     cur_conv = CurrencyConverter()
     amount = cur_conv.convert(500, 'CAD', currency)
     return (amount, currency)

@@ -14,7 +14,7 @@ def hello_world():
 def RBC_actions():
     flights = get_flights()
     flight_info = flights_info_string(flights)
-    if not flight_info:
+    if not flight_info or len(flight_info) is 0:
         return "Unable to find foreign currency information :("
     return flight_info
 
